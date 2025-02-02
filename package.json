@@ -1,0 +1,10 @@
+{
+  "dependencies": {
+    "cjs-loader": "^0.1.0",
+    "express": "^4.21.2",
+    "fs-extra": "^11.3.0",
+    "jsonwebtoken": "^9.0.2",
+    "socket.io": "^4.8.1",
+    "uuid": "^11.0.5"
+  }
+}
