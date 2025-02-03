@@ -2,7 +2,6 @@
 
 [![React](https://img.shields.io/badge/React-18.2.0-blue)](https://reactjs.org/)
 [![Socket.io](https://img.shields.io/badge/Socket.io-4.7.2-green)](https://socket.io/)
-[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 
 A multifunctional web application for real-time communication with support for channels and personal chats.
 
