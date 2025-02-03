@@ -43,22 +43,20 @@ A multifunctional web application for real-time communication with support for c
 - npm 9+
 
 1. Clone the repository:
-```bash
 
+```bash
 cd appchat
 ```
 Install dependencies:
 
 ```bash
-Copy
-npm install
+npm init -y
+npm install express socket.io body-parser cors
 ```
 Start the server and client:
 
 ```bash
-Copy
-npm run start:server
-npm run start:client
+node server.js
 ```
 The application will be available at: http://localhost:3000
 
