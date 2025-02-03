@@ -65,23 +65,23 @@ The application will be available at: http://localhost:3000
 Usage 💻
 1.Register/Login
 
-  Fill out the registration form
+- Fill out the registration form
   
-  Use your login details
+- Use your login details
   
-  2.Main interface
+2.Main interface
   
-  Left: list of users and channels
+- Left: list of users and channels
   
-  Right: active chat and channel/profile information
+- Right: active chat and channel/profile information
 
 3.Manage channels
 
-  Create new channels ("Create a channel" button in the channels section)
+- Create new channels ("Create a channel" button in the channels section)
   
-  Manage members (for admins(Channel creator))
+- Manage members (for admins(Channel creator))
   
-  Delete channels
+- Delete channels
 
 Author: [MrKrabsArt] 👨💻
 Contributions: PRs and suggestions are welcome! 🤝
