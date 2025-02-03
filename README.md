@@ -47,13 +47,13 @@ A multifunctional web application for real-time communication with support for c
 ```bash
 cd appchat
 ```
-Install dependencies:
+2. Install dependencies:
 
 ```bash
 npm init -y
 npm install express socket.io body-parser cors
 ```
-Start the server and client:
+3. Start the server and client:
 
 ```bash
 node server.js
