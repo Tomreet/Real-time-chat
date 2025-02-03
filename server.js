@@ -81,6 +81,7 @@ app.put('/users.json', async (req, res) => {
     }
     
     await writeJSONFile('users.json', updatedUsers);
+    io.emit('users-updated', updatedUsers);
     res.status(204).send();
   } catch (err) {
     res.status(500).send('Error updating users');
@@ -123,6 +124,7 @@ app.put('/channels.json', async (req, res) => {
     }
     
     await writeJSONFile('channels.json', updatedChannels);
+    io.emit('channels-updated', updatedChannels);
     res.status(204).send();
   } catch (err) {
     res.status(500).send('Error updating channels');
@@ -133,9 +135,36 @@ app.put('/channels.json', async (req, res) => {
 io.on('connection', (socket) => {
   console.log('New connection:', socket.id);
 
-  socket.on('message', (data) => {
-    console.log('Message received:', data);
-    socket.broadcast.emit('message', data);
+  socket.on('message', async (data) => {
+    try {
+      const users = await readJSONFile('users.json');
+      const sender = users.find(u => u.id === data.message.sender);
+      const enrichedMessage = {
+        ...data.message,
+        senderName: sender?.name || 'Unknown',
+        senderAvatar: sender?.avatar || 'https://cdn-icons-png.freepik.com/512/11702/11702778.png'
+      };
+
+      // Updating the channel in channels.json
+      const channels = await readJSONFile('channels.json');
+      const updatedChannels = channels.map(channel => {
+        if (channel.id === data.channelId) {
+          return {
+            ...channel,
+            messages: [...channel.messages, enrichedMessage]
+          };
+        }
+        return channel;
+      });
+
+      // Save updated channels
+      await writeJSONFile('channels.json', updatedChannels);
+
+      // We are sending the updated channel to all clients
+      io.emit('channels-updated', updatedChannels);
+    } catch (error) {
+      console.error('Error handling message:', error);
+    }
   });
 
   socket.on('disconnect', () => {
