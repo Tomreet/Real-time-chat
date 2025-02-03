@@ -1,4 +1,4 @@
-# React Chat Application 🚀
+# Real-time-chat 🚀
 
 [![React](https://img.shields.io/badge/React-18.2.0-blue)](https://reactjs.org/)
 [![Socket.io](https://img.shields.io/badge/Socket.io-4.7.2-green)](https://socket.io/)
