@@ -189,7 +189,7 @@ const RegisterForm = ({ onRegister, switchToLogin }) => {
           <h2>Registration</h2>
           <input
             type="text"
-            placeholder="Имя"
+            placeholder="Name"
             value={formData.name}
             onChange={(e) => setFormData({...formData, name: e.target.value})}
             required
@@ -204,7 +204,7 @@ const RegisterForm = ({ onRegister, switchToLogin }) => {
           {error && <div className="error">{error}</div>}
           <button type="submit">Register</button>
           <button type="button" onClick={switchToLogin}>
-          Back to Login
+          Return to entrance
           </button>
         </form>
       </div>
@@ -387,7 +387,11 @@ function App() {
   useEffect(() => {
     if (currentUser) {
       socket.current = io();
+      
       socket.current.on('message', handleIncomingMessage);
+      socket.current.on('users-updated', setUsers);
+      socket.current.on('channels-updated', setChannels);
+
       return () => socket.current.disconnect();
     }
   }, [currentUser]);
@@ -406,13 +410,14 @@ function App() {
     ));
   };
 
-  const sendMessage = () => {
+  const sendMessage = async () => {
     if (!messageText.trim() || !activeChat || activeChatType !== 'channel') return;
 
     const newMessage = {
       id: Date.now() + Math.random(),
       text: messageText,
       sender: currentUser.id,
+      senderName: currentUser.name,
       timestamp: new Date().toISOString(),
       channelId: activeChatId
     };
@@ -501,6 +506,7 @@ function App() {
     setActiveChatType('channel');
     setChannelForm({ name: '', description: '', avatar: '' });
     closeOverlay();
+    socket.current.emit('channels-updated', updatedChannels);
   };
 
   const deleteChannel = async (channelId) => {
@@ -514,6 +520,7 @@ function App() {
     
     setActiveChatId(null);
     closeOverlay();
+    socket.current.emit('channels-updated', updatedChannels);
   };
 
   const addUserToChannel = (userId) => {
@@ -540,6 +547,7 @@ function App() {
       const updatedChannel = updated.find(c => c.id === overlayData.id);
       setOverlayData(updatedChannel);
       saveChannels(updated);
+      socket.current.emit('channels-updated', updatedChannels);
       return updated;
     });
   };
@@ -561,6 +569,7 @@ function App() {
       const updatedChannel = updated.find(c => c.id === overlayData.id);
       setOverlayData(updatedChannel);
       saveChannels(updated);
+      socket.current.emit('channels-updated', updatedChannels);
       return updated;
     });
   };
@@ -712,25 +721,27 @@ function App() {
                 {activeChatType === 'channel' ? (
                   <div>
                     <div className="chat-messages">
-                      {activeChat.messages?.map(msg => {
-                        const sender = users.find(user => user.id === msg.sender);
-                        return (
-                          <div 
-                            key={msg.id} 
-                            className={`message ${msg.sender === currentUser.id ? 'outgoing' : 'incoming'}`}
-                          >
-                            {msg.sender !== currentUser.id && (
-                              <div className="message-name">
-                                {sender ? sender.name : 'Unknown'}
+                    {activeChat.messages?.map(msg => {
+                          const isOutgoing = msg.sender === currentUser.id;
+                          const timeOptions = { hour: '2-digit', minute: '2-digit' };
+                          
+                          return (
+                            <div 
+                              key={msg.id} 
+                              className={`message ${isOutgoing ? 'outgoing' : 'incoming'}`}
+                            >
+                              {!isOutgoing && (
+                                <div className="message-header">
+                                  <span className="message-sender">{msg.senderName}</span>
+                                </div>
+                              )}
+                              <div className="message-content">{msg.text}</div>
+                              <div className="message-time">
+                                {new Date(msg.timestamp).toLocaleTimeString([], timeOptions)}
                               </div>
-                            )}
-                            <div className="message-content">{msg.text}</div>
-                            <div className="message-time">
-                              {new Date(msg.timestamp).toLocaleTimeString()}
                             </div>
-                          </div>
-                        );
-                      })}
+                          );
+                        })}
                     </div>
 
                     {activeChat.members.some(m => m.id === currentUser.id) ? (
@@ -743,7 +754,7 @@ function App() {
                           onKeyPress={(e) => e.key === 'Enter' && sendMessage()}
                         />
                         <button onClick={sendMessage} disabled={!messageText.trim()}>
-                          Отправить
+                        Send
                         </button>
                       </div>
                     ) : (
