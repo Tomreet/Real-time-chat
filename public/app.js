@@ -495,18 +495,18 @@ function App() {
       }],
       messages: [],
     };
-
+  
     setChannels(prev => {
       const updated = [...prev, newChannel];
       saveChannels(updated);
+      socket.current.emit('channels-updated', updated);
       return updated;
     });
-
+  
     setActiveChatId(newChannel.id);
     setActiveChatType('channel');
     setChannelForm({ name: '', description: '', avatar: '' });
     closeOverlay();
-    socket.current.emit('channels-updated', updatedChannels);
   };
 
   const deleteChannel = async (channelId) => {
@@ -515,18 +515,18 @@ function App() {
     setChannels(prev => {
       const updated = prev.filter(c => c.id !== channelId);
       saveChannels(updated);
+      socket.current.emit('channels-updated', updated);
       return updated;
     });
     
     setActiveChatId(null);
     closeOverlay();
-    socket.current.emit('channels-updated', updatedChannels);
   };
 
   const addUserToChannel = (userId) => {
     const user = users.find(u => u.id === Number(userId));
     if (!user || !overlayData) return;
-
+  
     setChannels(prev => {
       const updated = prev.map(channel => {
         if (channel.id === overlayData.id && 
@@ -547,7 +547,7 @@ function App() {
       const updatedChannel = updated.find(c => c.id === overlayData.id);
       setOverlayData(updatedChannel);
       saveChannels(updated);
-      socket.current.emit('channels-updated', updatedChannels);
+      socket.current.emit('channels-updated', updated);
       return updated;
     });
   };
@@ -569,7 +569,7 @@ function App() {
       const updatedChannel = updated.find(c => c.id === overlayData.id);
       setOverlayData(updatedChannel);
       saveChannels(updated);
-      socket.current.emit('channels-updated', updatedChannels);
+      socket.current.emit('channels-updated', updatedChannel);
       return updated;
     });
   };
