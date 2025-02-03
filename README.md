@@ -83,5 +83,5 @@ Usage 💻
   
 - Delete channels
 
-Author: [MrKrabsArt] 👨💻
-Contributions: PRs and suggestions are welcome! 🤝
+### Author: [MrKrabsArt] 👨💻
+### Contributions: PRs and suggestions are welcome! 🤝
