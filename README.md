@@ -46,17 +46,20 @@ A multifunctional web application for real-time communication with support for c
 ```bash
 
 cd appchat
+```
 Install dependencies:
 
-bash
+```bash
 Copy
 npm install
+```
 Start the server and client:
 
-bash
+```bash
 Copy
 npm run start:server
 npm run start:client
+```
 The application will be available at: http://localhost:3000
 
 Usage 💻
