@@ -1,85 +1,116 @@
+const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:3001";
+
+// Получение заголовков авторизации
 const getAuthHeader = () => {
-    const currentUser = JSON.parse(localStorage.getItem('currentUser'));
-    return currentUser ? { 'X-User-ID': currentUser.id } : {};
+  const currentUser = JSON.parse(localStorage.getItem('currentUser') || 'null');
+  return currentUser ? { 
+    'X-User-ID': currentUser.id.toString(),
+    'Authorization': `Bearer ${currentUser.token || ''}`
+  } : {};
 };
 
+// Загрузка пользователей
 export const loadUsers = async () => {
-    try {
-      const response = await fetch('http://localhost:3001/users.json')
-  
-      const text = await response.text();
-  
-      // Проверяем, содержит ли ответ HTML
-      if (text.startsWith('<!DOCTYPE html>')) {
-        throw new Error('Сервер вернул HTML вместо JSON');
-      }
-  
-      if (!response.ok) {
-        throw new Error(`Ошибка загрузки: ${response.statusText}`);
-      }
-  
-      return JSON.parse(text);
-    } catch (error) {
-      console.error('Ошибка загрузки пользователей:', error);
+  try {
+    const response = await fetch(`${API_BASE_URL}/users.json`, {
+      headers: getAuthHeader()
+    });
+
+    if (response.status === 401) {
+      localStorage.removeItem('currentUser');
+      window.location.reload();
       return [];
     }
+
+    if (!response.ok) {
+      throw new Error(`HTTP error! status: ${response.status}`);
+    }
+
+    const data = await response.json();
+    if (!Array.isArray(data)) {
+      throw new Error('Received invalid users data format');
+    }
+    return data;
+  } catch (error) {
+    console.error('Error loading users:', error);
+    return [];
+  }
 };
 
+// Сохранение пользователей
 export const saveUsers = async (users) => {
-    try {
-      const response = await fetch('http://localhost:3001/users.json', {
-        method: 'PUT',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(users),
-      });
-  
-      // Проверяем, успешен ли ответ
-      if (!response.ok) {
-        throw new Error(`Ошибка сохранения: ${response.statusText}`);
-      }
-  
-      return true; // Успешное сохранение
-    } catch (error) {
-      console.error('Ошибка сохранения пользователей:', error);
-      return false; // Ошибка сохранения
+  if (!Array.isArray(users)) {
+    console.error('Attempting to save non-array users:', users);
+    return false;
+  }
+
+  try {
+    const response = await fetch(`${API_BASE_URL}/users.json`, {
+      method: 'PUT',
+      headers: { 
+        'Content-Type': 'application/json',
+        ...getAuthHeader()
+      },
+      body: JSON.stringify(users),
+    });
+
+    if (!response.ok) {
+      throw new Error(`HTTP error! status: ${response.status}`);
     }
+
+    return true;
+  } catch (error) {
+    console.error('Error saving users:', error);
+    return false;
+  }
 };
 
+// Загрузка каналов
 export const loadChannels = async () => {
-    try {
-      const response = await fetch('http://localhost:3001/channels.json', {
-        headers: getAuthHeader()
-      });
-  
-      if (!response.ok) {
-        throw new Error(`Ошибка загрузки: ${response.statusText}`);
-      }
-  
-      return await response.json();
-    } catch (error) {
-      console.error('Ошибка загрузки каналов:', error);
-      return [];
+  try {
+    const response = await fetch(`${API_BASE_URL}/channels.json`, {
+      headers: getAuthHeader()
+    });
+
+    if (!response.ok) {
+      throw new Error(`HTTP error! status: ${response.status}`);
     }
+
+    const data = await response.json();
+    if (!Array.isArray(data)) {
+      throw new Error('Received invalid channels data format');
+    }
+    return data;
+  } catch (error) {
+    console.error('Error loading channels:', error);
+    return [];
+  }
 };
 
+// Сохранение каналов
 export const saveChannels = async (channels) => {
-    try {
-      const response = await fetch('http://localhost:3001/channels.json', {
-        method: 'PUT',
-        headers: { 
-          'Content-Type': 'application/json',
-          ...getAuthHeader()
-        },
-        body: JSON.stringify(channels),
-      });
-  
-      if (!response.ok) {
-        throw new Error(`Ошибка сохранения: ${response.statusText}`);
-      }
-  
-      return true; // Успешное сохранение
-    } catch (error) {
-      console.error('Ошибка сохранения каналов:', error);
-      return false; // Ошибка сохранения
+  if (!Array.isArray(channels)) {
+    console.error('Attempting to save non-array channels:', channels);
+    return false;
+  }
+
+  try {
+    const response = await fetch(`${API_BASE_URL}/channels.json`, {
+      method: 'PUT',
+      headers: { 
+        'Content-Type': 'application/json',
+        ...getAuthHeader()
+      },
+      body: JSON.stringify(channels),
+    });
+
+    if (!response.ok) {
+      throw new Error(`HTTP error! status: ${response.status}`);
     }
+
+    return true;
+  } catch (error) {
+    console.error('Error saving channels:', error);
+    return false;
+  }
 };
